@@ -1,11 +1,17 @@
 import "./progressBar.css";
 import Stage from "./Stage";
 import { stages } from '../../data';
-import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setData } from "../../store/slices/setData";
 
 
 const ProgressBar = () => {
-    const [data, setData] = useState(stages);
+    const dispatch = useDispatch();
+    const data = useSelector(
+        (state) => state.manageData.data
+    );
+    
+    dispatch(setData(stages));
 
     const lastPlayedStage = data.findLast(stage =>
         stage.games.some(game => game.isPlayed === true)
@@ -16,9 +22,8 @@ const ProgressBar = () => {
 
     function solve(id, thresholdPoints, games) {
         const sum = games.reduce((acc, item) => acc + item.bestResult, 0);
-        let percentage;
-
-        percentage = id === 0 ? 
+        
+        const percentage = id === 0 ? 
             (sum / thresholdPoints) * 100 : 
             (sum / (thresholdPoints - data[id - 1].thresholdPoints)) * 100;
 
@@ -34,7 +39,7 @@ const ProgressBar = () => {
 
     return (
         <div className="progress-bar">
-            {stages.map((stage, id) => {
+            { data && data.map((stage, id) => {
                 return (
                     <Stage
                         id={id}
